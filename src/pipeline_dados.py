@@ -47,7 +47,7 @@ consol_pedidos      = converter_tudo(consol_pedidos)
 consol_redessociais = converter_tudo(consol_redessociais)
 #Converter as planilhas em um DB em SQL para tratamento de dados
 # Criar/conectar ao banco
-caminho_db = os.path.join("src", "queries", "blackbull.db")
+caminho_db = os.path.join("db", "blackbull.db")
 os.makedirs(os.path.dirname(caminho_db), exist_ok=True)
 
 conn = sqlite3.connect(caminho_db)
@@ -87,7 +87,7 @@ def salvar_tabela_se_houver_mudanca(conn, nome_tabela, df):
     print(f"Tabela {nome_tabela}: sem alterações.")
     return False
 
-caminho_db = os.path.join("src", "queries", "blackbull.db")
+caminho_db = os.path.join("db", "blackbull.db")
 os.makedirs(os.path.dirname(caminho_db), exist_ok=True)
 
 with sqlite3.connect(caminho_db) as conn:
@@ -95,25 +95,25 @@ with sqlite3.connect(caminho_db) as conn:
 
     houve_atualizacao |= salvar_tabela_se_houver_mudanca(
         conn,
-        "financeiro_raw",
+        "raw_financeiro",
         consol_financeiro
     )
 
     houve_atualizacao |= salvar_tabela_se_houver_mudanca(
         conn,
-        "marketing_raw",
+        "raw_marketing",
         consol_marketing
     )
 
     houve_atualizacao |= salvar_tabela_se_houver_mudanca(
         conn,
-        "pedidos_raw",
+        "raw_pedidos",
         consol_pedidos
     )
 
     houve_atualizacao |= salvar_tabela_se_houver_mudanca(
         conn,
-        "redes_sociais_raw",
+        "raw_redessociais",
         consol_redessociais
     )
 
