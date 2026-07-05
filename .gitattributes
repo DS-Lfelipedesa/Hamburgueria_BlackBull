@@ -4,6 +4,7 @@
 # GitHub Linguist language hints
 *.py linguist-language=Python
 *.sql linguist-language=SQL
+src/sql/** linguist-language=SQL linguist-detectable=true
 *.bat linguist-language=Batchfile
 
 # SQL files
