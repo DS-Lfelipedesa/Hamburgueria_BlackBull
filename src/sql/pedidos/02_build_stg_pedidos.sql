@@ -24,7 +24,17 @@ WITH pedidos_base AS (
     SELECT
         PedidoID,
         ItemID,
-        DataHora,
+        TRIM(DataHora) AS data_hora_original,
+        CASE
+            WHEN TRIM(DataHora) LIKE '____-__-__%' THEN datetime(TRIM(DataHora))
+            WHEN TRIM(DataHora) LIKE '__/__/____%' THEN datetime(
+                SUBSTR(TRIM(DataHora), 7, 4) || '-' ||
+                SUBSTR(TRIM(DataHora), 4, 2) || '-' ||
+                SUBSTR(TRIM(DataHora), 1, 2) ||
+                SUBSTR(TRIM(DataHora), 11)
+            )
+            ELSE NULL
+        END AS data_hora_tratada,
         ClienteID,
 
         TRIM(Canal) AS canal_original,
@@ -53,7 +63,8 @@ pedidos_sem_acentos AS (
     SELECT
         PedidoID,
         ItemID,
-        DataHora,
+        data_hora_original,
+        data_hora_tratada,
         ClienteID,
 
         -- Remove acentos do canal
@@ -118,10 +129,12 @@ pedidos_tratados AS (
     SELECT
         PedidoID,
         ItemID,
-        DataHora,
+        -- NOTE(ai-pass): mantenho o nome DataHora para nao quebrar scripts
+        -- seguintes, mas agora ele sai normalizado em ISO quando possivel.
+        data_hora_tratada AS DataHora,
 
-        DATE(DataHora) AS data_pedido,
-        TIME(DataHora) AS hora_pedido,
+        DATE(data_hora_tratada) AS data_pedido,
+        TIME(data_hora_tratada) AS hora_pedido,
 
         ClienteID,
 

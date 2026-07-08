@@ -1,32 +1,21 @@
 -- =========================================================
 -- QUERY 10: build_dim_forma_pagamento
--- ORIGEM: stg_pedidos
+-- ORIGEM: stg_pedidos + stg_financeiro
 -- DESTINO: dim_forma_pagamento
 --
 -- OBJETIVO:
--- Criar uma dimensão de formas de pagamento dos pedidos.
+-- Criar uma dimensao compartilhada de formas de pagamento.
 --
--- LOGICA:
--- 1. Buscar formas de pagamento únicas na stg_pedidos
--- 2. Tratar forma de pagamento nula ou vazia como 'Nao Informado'
--- 3. Criar uma chave técnica id_forma_pagamento
--- 4. Guardar a forma de pagamento padronizada
---
--- EXEMPLOS:
--- Credito
--- Debito
--- Pix
--- Voucher
--- Dinheiro
--- Cartao
--- Nao Informado
+-- NOTE(ai-pass): esta dimensao era criada apenas por pedidos, mas a
+-- fato_financeiro tambem usa id_forma_pagamento. Se a dimensao nasce
+-- so de pedidos, o financeiro perde relacionamento depois da orquestracao.
 -- =========================================================
 
 DROP TABLE IF EXISTS dim_forma_pagamento;
 
 CREATE TABLE dim_forma_pagamento (
     id_forma_pagamento INTEGER PRIMARY KEY,
-    forma_pagamento TEXT NOT NULL
+    forma_pagamento TEXT NOT NULL UNIQUE
 );
 
 INSERT INTO dim_forma_pagamento (
@@ -35,18 +24,24 @@ INSERT INTO dim_forma_pagamento (
 )
 WITH formas_pagamento_unicas AS (
     SELECT DISTINCT
-        -- Garante que a dimensão não tenha pagamento nulo ou em branco.
         CASE
             WHEN forma_pagamento IS NULL OR TRIM(forma_pagamento) = '' THEN 'Nao Informado'
             ELSE TRIM(forma_pagamento)
         END AS forma_pagamento
-
     FROM stg_pedidos
+
+    UNION
+
+    SELECT DISTINCT
+        CASE
+            WHEN forma_pagamento IS NULL OR TRIM(forma_pagamento) = '' THEN 'Nao Informado'
+            ELSE TRIM(forma_pagamento)
+        END AS forma_pagamento
+    FROM stg_financeiro
 ),
 
 formas_pagamento_numeradas AS (
     SELECT
-        -- Cria uma chave técnica sequencial para relacionamento na fato.
         ROW_NUMBER() OVER (
             ORDER BY forma_pagamento
         ) AS id_forma_pagamento,

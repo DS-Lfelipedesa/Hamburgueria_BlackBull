@@ -13,6 +13,7 @@ db/*.sqlite3
 db/*-journal
 db/*-wal
 db/*-shm
+db/backups/
 
 # Python cache
 __pycache__/
@@ -42,6 +43,9 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 
+# Local documentation / working notes
+docs/
+
 # Logs
 *.log
 logs/
@@ -60,4 +64,3 @@ desktop.ini
 # Excel temporary files
 ~$*.xlsx
 ~$*.xls
-
