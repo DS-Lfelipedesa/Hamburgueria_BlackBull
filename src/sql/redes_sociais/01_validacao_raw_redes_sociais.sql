@@ -12,7 +12,7 @@
 -- Chave natural esperada:
 -- PostID
 --
--- NOTE(ai-pass): mantive varias consultas separadas porque no DBeaver
+-- NOTE: mantive varias consultas separadas porque no DBeaver
 -- fica mais facil para um junior olhar um bloco por vez.
 -- =========================================================
 
@@ -135,4 +135,3 @@ WHERE r.CampanhaID IS NOT NULL
   AND dcm.id_campanha_marketing IS NULL
 GROUP BY r.CampanhaID
 ORDER BY qtd_posts DESC;
-

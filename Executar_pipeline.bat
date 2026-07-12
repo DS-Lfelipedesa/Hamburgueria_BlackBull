@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-cd /d "D:\PROJETOS\Hamburgueria_BlackBull"
+cd /d "%~dp0"
 
 echo ================================================
 echo Hamburgueria BlackBull - Automacao de Dados

@@ -11,7 +11,7 @@
 -- pelos atributos do movimento. Isso escondia duplicidades reais.
 -- Agora a chave usa id_raw_financeiro, que vem do rowid da raw.
 --
--- FIXME(ai-pass): quando o pipeline tiver carga incremental real, revisar
+-- FIXME: quando o pipeline tiver carga incremental real, revisar
 -- se id_raw_financeiro continua suficiente ou se entra hash do arquivo+linha.
 -- =========================================================
 
@@ -117,7 +117,7 @@ LEFT JOIN (
 ) AS dcc
     ON s.centro_custo = dcc.centro_custo
 LEFT JOIN (
-    -- NOTE(ai-pass): dim_forma_pagamento hoje e compartilhada e pode ter
+    -- NOTE: dim_forma_pagamento hoje e compartilhada e pode ter
     -- duplicatas por causa dos scripts antigos. Agrupo para nao duplicar fato.
     SELECT forma_pagamento, MIN(id_forma_pagamento) AS id_forma_pagamento
     FROM dim_forma_pagamento

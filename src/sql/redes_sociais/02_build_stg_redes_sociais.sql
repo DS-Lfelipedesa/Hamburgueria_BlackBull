@@ -16,7 +16,7 @@
 -- 4. Criar metricas auxiliares de engajamento.
 -- 5. Criar flags de auditoria para a validacao seguinte.
 --
--- TODO(ai-pass): se a regra de "Consolidado / Resumo Mensal" mudar,
+-- TODO: se a regra de "Consolidado / Resumo Mensal" mudar,
 -- talvez essa linha deva virar outra fato mensal separada.
 -- =========================================================
 
@@ -185,4 +185,3 @@ SELECT
     END AS flag_campanha_com_pago_vazio
 
 FROM textos_sem_acento;
-

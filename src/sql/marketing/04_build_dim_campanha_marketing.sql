@@ -6,7 +6,7 @@
 -- Grao:
 -- 1 linha = 1 campanha de marketing.
 --
--- NOTE(ai-pass): este arquivo estava com conteudo de plataforma marketing.
+-- NOTE: este arquivo estava com conteudo de plataforma marketing.
 -- Refeito para reconstruir a dimensao correta.
 
 CREATE TABLE IF NOT EXISTS dim_campanha_marketing (
@@ -31,4 +31,3 @@ WHERE CampanhaID IS NOT NULL
 ON CONFLICT(campanha_id_origem) DO UPDATE SET
     nome_campanha = excluded.nome_campanha,
     objetivo = excluded.objetivo;
-

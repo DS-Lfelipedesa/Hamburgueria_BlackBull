@@ -6,7 +6,7 @@
 -- Grao:
 -- 1 linha = 1 movimento financeiro vindo da raw.
 --
--- NOTE(ai-pass): esta versao corrige datas brasileiras DD/MM/YYYY HH:MM.
+-- NOTE: esta versao corrige datas brasileiras DD/MM/YYYY HH:MM.
 -- Antes o SQLite transformava essas datas em NULL e a fato perdia linhas.
 -- =========================================================
 
@@ -119,4 +119,3 @@ SELECT
     END AS flag_pedido_id_recuperado
 
 FROM datas_tratadas;
-

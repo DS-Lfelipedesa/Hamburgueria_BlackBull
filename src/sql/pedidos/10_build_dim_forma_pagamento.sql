@@ -6,7 +6,7 @@
 -- OBJETIVO:
 -- Criar uma dimensao compartilhada de formas de pagamento.
 --
--- NOTE(ai-pass): esta dimensao era criada apenas por pedidos, mas a
+-- NOTE: esta dimensao era criada apenas por pedidos, mas a
 -- fato_financeiro tambem usa id_forma_pagamento. Se a dimensao nasce
 -- so de pedidos, o financeiro perde relacionamento depois da orquestracao.
 -- =========================================================

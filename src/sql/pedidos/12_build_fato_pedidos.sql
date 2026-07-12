@@ -15,7 +15,7 @@
 -- CHAVE DE CONTROLE:
 -- chave_pedido_item = PedidoID + ItemID
 --
--- NOTE(ai-pass): a versao antiga fazia um UPDATE com uma subquery para
+-- NOTE: a versao antiga fazia um UPDATE com uma subquery para
 -- quase toda coluna. Funcionava, mas ficava muito lento em reexecucao.
 -- Aqui mantive a logica simples, mas com UPSERT.
 -- =========================================================
@@ -207,4 +207,3 @@ ON CONFLICT(chave_pedido_item) DO UPDATE SET
     taxa_entrega = excluded.taxa_entrega,
     campanha_id = excluded.campanha_id,
     observacao = excluded.observacao;
-

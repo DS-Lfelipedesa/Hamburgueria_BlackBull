@@ -1,280 +1,203 @@
-# Hamburgueria BlackBull - Pipeline de Dados e Tratamento SQL
+# Hamburgueria BlackBull - Pipeline de Dados
 
-Projeto de dados desenvolvido para consolidar planilhas operacionais de uma hamburgueria, carregar os dados em um banco SQLite e preparar uma camada tratada para analises em SQL e BI.
+Projeto local de engenharia de dados para consolidar planilhas Excel da Hamburgueria BlackBull, carregar uma base SQLite e montar tabelas analiticas para uso em SQL, DBeaver e Power BI.
 
-O projeto segue uma arquitetura simples em camadas:
+Status validado em 12/07/2026: pipeline completo executando com sucesso pelo Python e pelo `Executar_pipeline.bat`.
+
+## Visao Geral
+
+O fluxo atual segue estas camadas:
 
 ```text
-Planilhas Excel -> raw -> stg -> analises / BI
+Planilhas Excel -> raw -> staging -> dimensoes/fatos -> Power BI
 ```
 
-## Objetivo
+Areas tratadas:
 
-Criar um fluxo local de dados capaz de:
+- Financeiro
+- Pedidos
+- Marketing
+- Redes sociais
 
-- Ler planilhas Excel de diferentes areas do negocio.
-- Consolidar os arquivos por area.
-- Criar tabelas brutas no SQLite.
-- Atualizar as tabelas raw somente quando houver alteracao nos dados.
-- Tratar os dados da camada raw para a camada stg usando SQL persistente.
-- Disponibilizar uma base organizada para consultas no DBeaver e analises em Power BI.
+O banco final fica em:
 
-## Tecnologias Utilizadas
+```text
+db/blackbull.db
+```
 
-- Python
-- Pandas
-- SQLite
-- SQL
-- DBeaver
-- Python-dotenv
-- OpenPyXL
-- Excel
-- Power BI
-
-## Estrutura Atual do Projeto
+## Estrutura
 
 ```text
 Hamburgueria_BlackBull/
-|
 |-- data/
 |   |-- raw/
 |       |-- Financeiro/
 |       |-- Marketing/
 |       |-- Pedidos/
 |       |-- RedesSociais/
-|
 |-- db/
 |   |-- blackbull.db
-|
+|   |-- backups/
+|-- docs/
+|-- logs/
 |-- src/
 |   |-- pipeline_dados.py
+|   |-- orquestrador.py
 |   |-- sql/
-|       |-- 01_validacao_raw_financeiro.sql
-|       |-- 02_build_stg_financeiro.sql
-|       |-- 03_validacao_stg_financeiro.sql
-|
-|-- .env
+|       |-- financeiro/
+|       |-- pedidos/
+|       |-- marketing/
+|       |-- redes_sociais/
 |-- .env.example
-|-- .gitattributes
-|-- .gitignore
-|-- Briefing_BI_Hamburgueria.docx
 |-- Executar_pipeline.bat
 |-- README.md
 |-- requirements.txt
 ```
 
-## Camadas de Dados
+## Componentes
 
-### Camada raw
+`src/pipeline_dados.py`
 
-A camada raw representa os dados brutos consolidados a partir das planilhas Excel.
+Le as planilhas Excel configuradas no `.env`, consolida os arquivos por area e grava as tabelas raw no SQLite. A tabela raw so e recriada quando os dados mudam.
 
-As tabelas raw sao criadas pelo pipeline Python:
+`src/orquestrador.py`
 
-```text
-raw_financeiro
-raw_marketing
-raw_pedidos
-raw_redessociais
-```
+Controla a execucao completa:
 
-Essas tabelas devem manter os dados o mais proximo possivel da origem.
+1. Cria backup do banco atual.
+2. Executa a carga raw.
+3. Executa os SQLs de staging.
+4. Recria dimensoes.
+5. Recria ou atualiza fatos.
+6. Executa validacoes SQL.
+7. Executa validacoes finais em Python.
+8. Restaura o backup se houver erro, salvo quando usado `--keep-broken-db`.
 
-### Camada stg
+`Executar_pipeline.bat`
 
-A camada stg representa os dados tratados e padronizados para analise.
+Atalho para executar o orquestrador no Windows. Em caso de erro, mostra as linhas principais do log mais recente.
 
-Exemplo ja implementado:
+## Configuracao
 
-```text
-stg_financeiro
-```
-
-A tabela `stg_financeiro` e criada a partir da `raw_financeiro` por scripts SQL persistentes.
-
-## Fluxo de Execucao
-
-O fluxo recomendado do projeto e:
+Crie o arquivo `.env` a partir de `.env.example`:
 
 ```text
-1. Atualizar ou adicionar planilhas em data/raw/
-2. Executar o pipeline Python
-3. Validar a camada raw no DBeaver
-4. Executar o script de criacao da camada stg
-5. Validar a camada stg no DBeaver
-6. Usar a camada stg para analises e BI
+PASTA_FINANCEIRO=data\raw\Financeiro
+PASTA_MARKETING=data\raw\Marketing
+PASTA_PEDIDOS=data\raw\Pedidos
+PASTA_REDESSOCIAIS=data\raw\RedesSociais
 ```
 
-## Configuracao do Ambiente
+Tambem e possivel usar caminhos absolutos no `.env` quando as planilhas estiverem fora da pasta do projeto, mas evite publicar esses caminhos.
 
-Crie um arquivo `.env` com base no `.env.example`.
-
-Exemplo:
-
-```text
-PASTA_FINANCEIRO=D:\PROJETOS\Hamburgueria_BlackBull\data\raw\Financeiro
-PASTA_MARKETING=D:\PROJETOS\Hamburgueria_BlackBull\data\raw\Marketing
-PASTA_PEDIDOS=D:\PROJETOS\Hamburgueria_BlackBull\data\raw\Pedidos
-PASTA_REDESSOCIAIS=D:\PROJETOS\Hamburgueria_BlackBull\data\raw\RedesSociais
-```
-
-## Instalacao das Dependencias
-
-Instale as dependencias com:
+Instale as dependencias:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-O arquivo `requirements.txt` contem:
+## Execucao
 
-```text
-pandas
-python-dotenv
-openpyxl
-```
-
-## Execucao do Pipeline Python
-
-Pelo terminal, na raiz do projeto:
-
-```bash
-python src/pipeline_dados.py
-```
-
-Ou execute:
+Modo recomendado:
 
 ```text
 Executar_pipeline.bat
 ```
 
-O pipeline gera ou atualiza o banco:
+Pelo terminal:
 
-```text
-db/blackbull.db
+```bash
+python src/orquestrador.py
 ```
 
-## Tratamento SQL no DBeaver
+Opcoes uteis:
 
-Os scripts SQL ficam em:
-
-```text
-src/sql/
+```bash
+python src/orquestrador.py --skip-raw
+python src/orquestrador.py --keep-broken-db
 ```
 
-Para executar scripts com mais de uma query no DBeaver, use:
+Use `--skip-raw` quando quiser reaplicar apenas SQLs e validacoes sobre o banco atual. Use `--keep-broken-db` somente para debug, porque ele impede o restore automatico do backup.
+
+## Saida Analitica
+
+Fatos principais:
+
+- `fato_financeiro`
+- `fato_pedidos`
+- `fato_marketing`
+- `fato_redes_sociais`
+
+Dimensoes principais:
+
+- `dim_data`
+- `dim_forma_pagamento`
+- `dim_cupom`
+- `dim_cliente`
+- `dim_produto`
+- `dim_canal`
+- `dim_plataforma`
+- `dim_bairro`
+- `dim_status_pedido`
+- `dim_tipo_movimento`
+- `dim_categoria_financeira`
+- `dim_centro_custo`
+- `dim_fornecedor_origem`
+- `dim_campanha_marketing`
+- `dim_plataforma_marketing`
+- `dim_rede_social`
+- `dim_tipo_conteudo`
+- `dim_tema_conteudo`
+
+Resultado da ultima validacao:
+
+- Financeiro: 63.360 linhas na fato.
+- Pedidos: 108.118 linhas na fato.
+- Marketing: 346 linhas na fato.
+- Redes sociais: 2.527 linhas na fato.
+- `PRAGMA integrity_check`: ok.
+- Chaves dimensionais obrigatorias: sem nulos.
+- Flags criticas consultadas: sem ocorrencias.
+
+## Power BI
+
+A base esta pronta para uma demonstracao em Power BI usando as tabelas fato e dimensao. O modelo recomendado e estrela, com as fatos no centro e relacionamentos muitos-para-um para as dimensoes.
+
+Cuidados antes da demonstracao:
+
+- Ocultar tabelas `raw_*` e `stg_*` no Power BI.
+- Usar `dim_data` como calendario principal.
+- Revisar exposicao de identificadores de cliente, pedido e campanha antes de apresentar para publico externo.
+- Criar medidas DAX no Power BI em vez de alterar fatos para calculos de apresentacao.
+
+## Logs e Backups
+
+Logs de execucao:
 
 ```text
-Alt + X
+logs/orquestrador_YYYYMMDD_HHMMSS.log
 ```
 
-Use `Ctrl + Enter` apenas quando quiser executar uma query isolada.
-
-## Scripts da Tabela Financeiro
-
-### 01_validacao_raw_financeiro.sql
-
-Valida a tabela bruta `raw_financeiro` antes do tratamento.
-
-Este script verifica:
-
-- Quantidade de registros.
-- Campos nulos ou vazios.
-- Distribuicao de categorias.
-- Distribuicao de centros de custo.
-- Tipos financeiros.
-- Formas de pagamento.
-- Fornecedores ou origens.
-
-### 02_build_stg_financeiro.sql
-
-Cria ou recria a tabela `stg_financeiro`.
-
-Principais tratamentos aplicados:
-
-- Separacao de data e hora.
-- Padronizacao do tipo financeiro.
-- Padronizacao de categorias.
-- Remocao de espacos em textos.
-- Conversao de `PedidoID` para inteiro.
-- Regra de negocio para `pedido_id`:
-  - Receita pode ter pedido associado.
-  - Despesa sempre deve ter `pedido_id` nulo.
-- Criacao de `valor_movimento`:
-  - Receita positiva.
-  - Despesa negativa.
-- Criacao de flags de auditoria.
-
-### 03_validacao_stg_financeiro.sql
-
-Valida a tabela tratada `stg_financeiro`.
-
-Este script verifica:
-
-- Total de linhas da staging.
-- Datas invalidas.
-- Tipos invalidos.
-- Valores invalidos.
-- Pedidos recuperados.
-- Despesas com `pedido_id` preenchido.
-- Distribuicao por categoria.
-- Distribuicao por centro de custo.
-- Distribuicao por forma de pagamento.
-
-## Processo Recomendado para Atualizacao dos Dados
-
-Sempre que as planilhas raw forem alteradas:
+Backups automaticos:
 
 ```text
-1. Execute src/pipeline_dados.py
-2. Execute 01_validacao_raw_financeiro.sql
-3. Execute 02_build_stg_financeiro.sql
-4. Execute 03_validacao_stg_financeiro.sql
+db/backups/
 ```
 
-Se todas as validacoes estiverem corretas, a camada `stg_financeiro` esta pronta para consumo analitico.
+O backup e criado antes de cada execucao completa. Se o processo falhar, o orquestrador tenta restaurar o banco anterior.
 
-## Boas Praticas do Projeto
+## Pontos de Atencao
 
-- Manter as planilhas originais em `data/raw/`.
-- Manter o banco SQLite em `db/`.
-- Manter scripts SQL persistentes em `src/sql/`.
-- Nunca tratar dados manualmente direto no banco sem registrar a regra em SQL.
-- Criar um conjunto de 3 scripts por tabela tratada:
-  - validacao da raw
-  - criacao da stg
-  - validacao da stg
-- Usar nomes padronizados:
-  - `raw_nome_tabela`
-  - `stg_nome_tabela`
+- O banco SQLite e local e nao tem controle de acesso proprio.
+- O `.env`, dados raw, banco, logs e backups devem continuar fora do Git.
+- A pasta `db/backups/` pode crescer rapido porque cada execucao cria um novo backup.
+- A carga raw ainda compara DataFrames inteiros para decidir atualizacao; funciona para o volume atual, mas nao e carga incremental real.
+- A integridade relacional e validada por consultas, nao por constraints formais de chave estrangeira no SQLite.
 
-## Sugestoes de Melhorias
+## Relatorio
 
-- Atualizar o `.env.example` com caminhos compatíveis com `data/raw/`.
-- Corrigir possiveis problemas de encoding no `pipeline_dados.py`.
-- Remover codigo duplicado de criacao do caminho do banco no pipeline.
-- Adicionar validacao para extensoes e arquivos temporarios do Excel.
-- Criar logs de execucao do pipeline.
-- Criar scripts SQL para as demais tabelas raw.
-- Avaliar se `db/blackbull.db` deve ser versionado ou ignorado no Git, dependendo do objetivo do portfolio.
-- Criar uma pasta `docs/` para briefing, dicionario de dados e premissas.
-- Criar uma pasta `notebooks/` somente se houver analises exploratorias em Jupyter.
+O relatorio analitico do projeto esta em:
 
-## Proximas Etapas
-
-- Criar scripts `raw -> stg` para marketing.
-- Criar scripts `raw -> stg` para pedidos.
-- Criar scripts `raw -> stg` para redes sociais.
-- Criar camada analitica com indicadores finais.
-- Conectar o Power BI preferencialmente na camada stg ou em views analiticas.
-
-## Status Atual
-
-O projeto ja possui:
-
-- Pipeline Python para consolidacao das planilhas.
-- Banco SQLite em `db/blackbull.db`.
-- Scripts SQL persistentes para tratamento da tabela financeiro.
-- Camada `stg_financeiro` criada e validada.
-
-O projeto esta pronto para evoluir o tratamento das demais tabelas.
+```text
+docs/RELATORIO_ANALITICO_PROJETO.md
+```

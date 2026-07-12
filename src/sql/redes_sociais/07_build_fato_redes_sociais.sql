@@ -13,7 +13,7 @@
 -- id_data, id_rede_social, id_tipo_conteudo, id_tema_conteudo,
 -- id_campanha_marketing.
 --
--- FIXME(ai-pass): quando o projeto tiver orquestrador, avaliar se esta fato
+-- FIXME: quando o projeto tiver orquestrador, avaliar se esta fato
 -- deve ser incremental. Agora ela e reconstruida para evitar sujeira antiga.
 -- =========================================================
 
@@ -127,4 +127,3 @@ LEFT JOIN dim_campanha_marketing dcm
 WHERE s.flag_post_id_invalido = 0
   AND s.flag_data_invalida = 0
   AND s.flag_metricas_invalidas = 0;
-

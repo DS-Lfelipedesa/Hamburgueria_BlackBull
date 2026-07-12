@@ -8,8 +8,6 @@ Roda:
 4. testes de integridade;
 5. restore automatico se algo quebrar.
 
-NOTE(ai-pass): este arquivo ainda e uma primeira versao pragmatica.
-Ele centraliza a ordem que antes ficava na cabeca/DBeaver.
 """
 
 from __future__ import annotations
@@ -49,7 +47,7 @@ SQL_STEPS: list[SqlStep] = [
     SqlStep("staging", "redes_sociais/02_build_stg_redes_sociais.sql"),
 
     # Dimensoes. Algumas ainda estao em pastas de dominio, mas sao usadas
-    # por mais de uma fato. TODO(ai-pass): mover shared dims depois.
+    # por mais de uma fato. TODO: mover dimensoes compartilhadas depois.
     SqlStep("dimensions", "financeiro/04_build_dim_financeiro.sql"),
     SqlStep("dimensions", "pedidos/04_build_dim_produto.sql"),
     SqlStep("dimensions", "pedidos/05_build_dim_cliente.sql"),

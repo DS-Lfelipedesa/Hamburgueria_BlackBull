@@ -129,7 +129,7 @@ pedidos_tratados AS (
     SELECT
         PedidoID,
         ItemID,
-        -- NOTE(ai-pass): mantenho o nome DataHora para nao quebrar scripts
+        -- NOTE: mantenho o nome DataHora para nao quebrar scripts
         -- seguintes, mas agora ele sai normalizado em ISO quando possivel.
         data_hora_tratada AS DataHora,
 

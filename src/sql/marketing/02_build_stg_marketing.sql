@@ -1,7 +1,7 @@
 -- query 02 - carga stg marketing
 -- objetivo: levar a raw_marketing pra stg_marketing com limpeza basica
 -- NOTE: agora recria a tabela, assim o projeto consegue rodar do zero.
--- NOTE(ai-pass): datas DD/MM/YYYY HH:MM sao normalizadas aqui.
+-- NOTE: datas DD/MM/YYYY HH:MM sao normalizadas aqui.
 
 DROP TABLE IF EXISTS stg_marketing;
 
@@ -75,4 +75,3 @@ SELECT
     data_fim_original
 
 FROM datas;
-
