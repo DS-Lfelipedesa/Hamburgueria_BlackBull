@@ -186,13 +186,6 @@ db/backups/
 
 O backup é criado antes de cada execução completa. Se o processo falhar, o orquestrador tenta restaurar o banco anterior.
 
-## Pontos de Atenção
-
-- O banco SQLite é local e não tem controle de acesso próprio.
-- O `.env`, dados raw, banco, logs e backups devem continuar fora do Git.
-- A pasta `db/backups/` pode crescer rápido porque cada execução cria um novo backup.
-- A carga raw ainda compara DataFrames inteiros para decidir atualização; funciona para o volume atual, mas não é carga incremental real.
-- A integridade relacional é validada por consultas, não por constraints formais de chave estrangeira no SQLite.
 
 ## Relatório
 
